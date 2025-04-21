@@ -12,12 +12,12 @@ dependencies:
   font_awesome_flutter: ^10.8.0
   google_fonts: ^6.2.1
   provider: ^6.1.2
-  shared_preferences: ^2.5.1
+  shared_preferences: ^2.5.2
   collection: ^1.19.0
   from_css_color: ^2.0.0
   intl: ^0.20.2
-  json_path: ^0.4.2
-  timeago: ^3.2.2
+  json_path: ^0.7.5
+  timeago: 3.2.2
   url_launcher: ^6.3.1
   page_transition: ^2.2.1
   auto_size_text: ^3.0.0
@@ -30,6 +30,7 @@ dependencies:
   path_provider: ^2.1.5
   expandable: ^5.0.1
   youtube_player_flutter: ^9.1.1
+  cloud_firestore: ^5.6.5
   
 dev_dependencies:
   flutter_test:

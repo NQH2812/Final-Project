@@ -64,12 +64,7 @@ class _MovieCardWidgetState extends State<MovieCardWidget> {
         height: 224,
         decoration: BoxDecoration(
           color: Color(0x00B7BCBE),
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(8),
-            bottomRight: Radius.circular(8),
-            topLeft: Radius.circular(8),
-            topRight: Radius.circular(8),
-          ),
+          borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: Color(0xFFB0B1B1),
           ),
@@ -79,10 +74,10 @@ class _MovieCardWidgetState extends State<MovieCardWidget> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(0),
-                bottomRight: Radius.circular(0),
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+                bottomLeft: Radius.zero,
+                bottomRight: Radius.zero
               ),
               child: Image.network(
                 widget.image,

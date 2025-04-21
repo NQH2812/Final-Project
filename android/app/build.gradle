@@ -2,44 +2,54 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
-    id "com.google.gms.google-services" // 🔥 Thêm dòng này
+    id "com.google.gms.google-services"
 }
 
 android {
     namespace = "com.example.movie_app"
-    // compileSdk = flutter.compileSdkVersion
-    compileSdkVersion 34
+    compileSdkVersion 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-
 
     kotlinOptions {
-    jvmTarget = "17"
+        jvmTarget = "17"
     }
-
 
     defaultConfig {
         applicationId "com.example.movie_app"
         minSdk = 23
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
     }
-
 
     buildTypes {
         release {
             signingConfig = signingConfigs.debug
         }
     }
+
+    // Thêm cấu hình để giải quyết vấn đề với đường dẫn
+    packagingOptions {
+        exclude "META-INF/DEPENDENCIES"
+        exclude "META-INF/LICENSE"
+        exclude "META-INF/LICENSE.txt"
+        exclude "META-INF/license.txt"
+        exclude "META-INF/NOTICE"
+        exclude "META-INF/NOTICE.txt"
+        exclude "META-INF/notice.txt"
+        exclude "META-INF/ASL2.0"
+        exclude "META-INF/*.kotlin_module"
+    }
 }
 
 dependencies {
-    implementation platform('com.google.firebase:firebase-bom:32.7.0')
+    // Cập nhật phiên bản Firebase BOM
+    implementation platform('com.google.firebase:firebase-bom:32.7.2')
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-firestore'
 }
@@ -49,4 +59,3 @@ flutter {
 }
 
 apply plugin: 'com.google.gms.google-services'
-

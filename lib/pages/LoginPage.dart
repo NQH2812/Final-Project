@@ -32,7 +32,7 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
   @override
   void dispose() {
     _model.dispose();
-
+    
     super.dispose();
   }
 
@@ -147,6 +147,7 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                             controller: _model.emailAddressTextController,
                             focusNode: _model.emailAddressFocusNode,
                             autofocus: true,
+                            textInputAction: TextInputAction.next,
                             autofillHints: [AutofillHints.email],
                             obscureText: false,
                             decoration: InputDecoration(
@@ -215,6 +216,7 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                             controller: _model.passwordTextController,
                             focusNode: _model.passwordFocusNode,
                             autofocus: false,
+                            textInputAction: TextInputAction.done,
                             autofillHints: [AutofillHints.password],
                             obscureText: !_model.passwordVisibility,
                             decoration: InputDecoration(
@@ -296,14 +298,12 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                             onPressed: () async {
                               bool isSuccess = await AuthService().signIn(
                                 email: _model.emailAddressTextController.text, 
-                                password: _model.passwordTextController.text
+                                password: _model.passwordTextController.text,
+                                context: context
                               );
-                              if (isSuccess) {
-                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePageWidget())
-                              );
-                              } else {
+                              if (!isSuccess) {
                                 print('Đăng nhập thất bại');
-                              }
+                              } 
                             },
                             text: 'Sign In',
                             options: FFButtonOptions(

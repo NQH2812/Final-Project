@@ -28,7 +28,6 @@ class MovieService  {
     }
   }
 
-
   // TRENDING MOVIES
   static Future<List<dynamic>> fetchTrendingMovies(String timeWindow) async {
     final data = await _fetchData("https://api.themoviedb.org/3/trending/movie/$timeWindow?language=en-US");
@@ -74,4 +73,10 @@ class MovieService  {
     return data?['cast'] ?? [];
   }
 
+  // SEARCH
+    static Future<List<dynamic>> fetchMoviesBySearch(String query) async {
+    final data = await _fetchData(
+        "https://api.themoviedb.org/3/search/movie?query=$query&language=en-US&page=1");
+    return data?['results'] ?? [];
+  }
 }

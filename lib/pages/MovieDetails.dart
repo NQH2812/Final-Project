@@ -4,6 +4,8 @@ import 'package:movie_app/service/api.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:movie_app/model/DetailsModel.dart';
+import '../service/provider.dart';
+import '../service/package.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class DetailsWidget extends StatefulWidget {
@@ -70,10 +72,8 @@ class _DetailsWidgetState extends State<DetailsWidget> {
       });
     }
   });
-
   setState(() {}); 
 }
-
 
   @override
   void dispose() {
@@ -83,17 +83,16 @@ class _DetailsWidgetState extends State<DetailsWidget> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(226, 226, 226, 0.5),
+        backgroundColor: Color(0xFFC30303),
         automaticallyImplyLeading: false,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.black, size: 30),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 30),
           onPressed: () => Navigator.pop(context),
         ),
         elevation: 0,
@@ -127,10 +126,10 @@ class _DetailsWidgetState extends State<DetailsWidget> {
                                       ),
                                 ),
                                 const SizedBox(height: 8),
-
                                 _isVideoReady && _youtubeController != null
-                                    ? YoutubePlayerBuilder(
-                                        player: YoutubePlayer(
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(12), 
+                                        child: YoutubePlayer(
                                           controller: _youtubeController!,
                                           showVideoProgressIndicator: true,
                                           onReady: () {
@@ -139,11 +138,6 @@ class _DetailsWidgetState extends State<DetailsWidget> {
                                             }
                                           },
                                         ),
-                                        builder: (context, player) {
-                                          return Column(
-                                            children: [player],
-                                          );
-                                        },
                                       )
                                     : Container(
                                         width: double.infinity,
@@ -170,11 +164,10 @@ class _DetailsWidgetState extends State<DetailsWidget> {
                                           ),
                                         ),
                                       ),
-
                                 const SizedBox(height: 16),
                                 Row(
                                   children: [
-                                    const Icon(Icons.calendar_today_rounded, color: Colors.red),
+                                    const Icon(Icons.calendar_today_rounded, color: Color.fromARGB(255, 202, 30, 39)),
                                     Text(
                                       movieDetails?['release_date'] ?? "N/A",
                                       style: FlutterFlowTheme.of(context).bodyMedium.override(
@@ -184,21 +177,36 @@ class _DetailsWidgetState extends State<DetailsWidget> {
                                             color: Colors.black,
                                           ),
                                     ),
-                                    const Expanded(child: SizedBox()),
+                                    const SizedBox(width: 10,),
                                     const Icon(Icons.star, color: Color(0xFFFFD300), size: 20),
                                     Text(
                                       '${movieDetails?['vote_average']?.toDouble()?.toStringAsFixed(1) ?? "N/A"}',
                                       style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                            fontFamily: 'Inter',
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 16,
-                                            color: Colors.black,
-                                          ),
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                      ),
                                     ),
+                                    Spacer(),
+                                    IconButton(
+                                      onPressed: () {
+                                        final favoriteProvider = Provider.of<FavoriteMoviesProvider>(context, listen: false);
+                                        favoriteProvider.toggleFavorite(movieDetails!);
+                                      }, 
+                                      icon: Consumer<FavoriteMoviesProvider>(
+                                        builder: (context, favoriteProvider, child) {
+                                          final isFav = favoriteProvider.isFavorite(widget.movieId);
+                                          return Icon(
+                                            isFav ? Icons.bookmark : Icons.bookmark_border,
+                                            color: isFav ? Colors.red : Colors.black,
+                                          );
+                                        },
+                                      ),
+                                    )
                                   ],
                                 ),
                                 const SizedBox(height: 16),
-
                                 ExpandableNotifier(
                                   controller: _model.expandableExpandableController,
                                   child: Column(

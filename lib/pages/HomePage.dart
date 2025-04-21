@@ -6,14 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:movie_app/pages/MovieDetails.dart';
 import 'package:movie_app/service/api.dart';
 import 'package:movie_app/component/MovieCard.dart';
+import '../component/BottomNav.dart';
+import '../pages/ListMovie.dart';
 import 'package:movie_app/model/HomePageModel.dart';
 export 'package:movie_app/model/HomePageModel.dart';
 
 class HomePageWidget extends StatefulWidget {
   const HomePageWidget({super.key});
-  
-  static String routeName = 'Home';
-  static String routePath = '/home';
+
+  static String routeName = 'HomePage';
+  static String routePath = '/homePage';
 
   @override
   State<HomePageWidget> createState() => _HomePageWidgetState();
@@ -81,7 +83,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
 
   //GET TRENDING MOVIES
   Future<void> fetchTrendingMovies() async {
-  final fetchedTrendingMovies = await MovieService.fetchTrendingMovies('day'); 
+  final fetchedTrendingMovies = await MovieService.fetchTrendingMovies('week'); 
   if (mounted) {
     setState(() {
       trendingMovies = fetchedTrendingMovies;
@@ -113,7 +115,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                     child: Stack(
                       children: [
                         Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 40),
+                          padding: EdgeInsetsDirectional.fromSTEB(10, 0, 10, 40),
                           child: isLoading
                               ? Center(child: CircularProgressIndicator())
                               : PageView.builder(
@@ -128,7 +130,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                               return Stack(
                                 children: [
                                   ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius: BorderRadius.circular(10),
                                     child: Image.network(
                                       'https://image.tmdb.org/t/p/w500${moviePageview['backdrop_path']}',
                                       width: double.infinity,
@@ -142,6 +144,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                       width: double.infinity,
                                       height: 200,
                                       decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
                                         gradient: LinearGradient(
                                           colors: [
                                             Colors.transparent,
@@ -219,8 +222,9 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                               child: IconButton(
                                                 icon: Icon(
                                                   Icons.play_circle_fill_outlined, 
-                                                  size: 35,
-                                                  color: const Color.fromARGB(255, 255, 0, 0),),
+                                                  size: 40,
+                                                  color: Color.fromARGB(255, 202, 30, 39),
+                                                ),
                                                 onPressed: () async {
                                                   Navigator.push(
                                                     context,
@@ -289,12 +293,19 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                       ),
                       GestureDetector(
                         onTap: () => {
-                          // Xem toan bo list
+                          Navigator.push(
+                            context, 
+                            MaterialPageRoute(
+                              builder: (context) => MoviesListPage(
+                                title: 'Top rated movies', 
+                                movies: topRatedMovies,)
+                            )
+                          )
                         },
                         child: Text(
                           'See all >',
                           style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                fontFamily: 'Poppins',
+                                fontFamily: 'Inter',
                                 fontSize: 16,
                                 letterSpacing: 0.0,
                               ),
@@ -317,7 +328,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                     itemCount: topRatedMovies.length > 10 ? 10 : topRatedMovies.length,
                     itemBuilder: (context, index) {
                       return Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
+                        padding: EdgeInsetsDirectional.fromSTEB(10, 0, 0, 0),
                         child: wrapWithModel(
                           model: _model.movieCardModel2,
                           updateCallback: () => safeSetState(() {}),
@@ -348,13 +359,25 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                               letterSpacing: 0.0,
                             ),
                       ),
-                      Text(
-                        'See all >',
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              fontFamily: 'Inter',
-                              fontSize: 16,
-                              letterSpacing: 0.0,
-                            ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context, 
+                            MaterialPageRoute(
+                              builder: (context) => MoviesListPage(
+                                title: 'Top rated movies', 
+                                movies: popularMovies,)
+                            )
+                          );
+                        },
+                        child: Text(
+                          'See all >',
+                          style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                fontFamily: 'Inter',
+                                fontSize: 16,
+                                letterSpacing: 0.0,
+                              ),
+                        ),
                       ),
                     ],
                   ),
@@ -373,7 +396,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                     itemCount: popularMovies.length > 10 ? 10 : popularMovies.length,
                     itemBuilder: (context, index) {
                       return Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 0, 10, 0),
+                        padding: EdgeInsetsDirectional.fromSTEB(10, 0, 2, 0),
                         child: wrapWithModel(
                           model: _model.movieCardModel2,
                           updateCallback: () => safeSetState(() {}),
@@ -393,6 +416,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
             ),
           ),
         ),
+        bottomNavigationBar: const BottomNavBar(currentIndex: 0),
       ),
     );
   }
