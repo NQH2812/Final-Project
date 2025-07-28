@@ -4,7 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:movie_app/pages/HomePage.dart';
 import 'package:movie_app/pages/LoginPage.dart';
-import 'package:movie_app/service/provider.dart'; // Import provider
+import 'package:movie_app/service/provider.dart'; 
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -43,31 +43,25 @@ class MyApp extends StatelessWidget {
       home: AuthCheck(),
     );
   }
+
   static of(BuildContext context) {}
 }
 
-class AuthCheck extends StatefulWidget {
-  @override
-  _AuthCheckState createState() => _AuthCheckState();
-}
-class _AuthCheckState extends State<AuthCheck> {
-  bool _initialized = false;
+class AuthCheck extends StatelessWidget {
+  const AuthCheck({super.key});
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
-          final user = snapshot.data;
-          if (user != null && !_initialized) {
-            final provider = Provider.of<FavoriteMoviesProvider>(context, listen: false);
-            provider.initializeFavorites();
-            provider.loadFavoritesFromFirestore();
-            _initialized = true;
+          if (snapshot.hasData) {
+            return HomePageWidget();
           }
-          return user != null ? HomePageWidget() : LoginPageWidget();
+          return LoginPageWidget();
         }
-        return const Center(child: CircularProgressIndicator());
+        return Center(child: CircularProgressIndicator());
       },
     );
   }

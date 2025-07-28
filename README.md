@@ -1,16 +1,12 @@
 # movie_app
 
-A new Flutter project.
+Tên đồ án: Ứng dụng xem phim trên di động
 
-## Getting Started
+## Cách chạy chương trình
 
-This project is a starting point for a Flutter application.
+1. Giải nén file movie_app.zip
+2. Crtl+Shift+` để mở terminal
+3. Nhập lệnh "flutter pub get" để tải các gói tài nguyên
+4. Nhập lệnh "flutter run" để chạy chương trình
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.

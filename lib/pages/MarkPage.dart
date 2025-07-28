@@ -1,152 +1,125 @@
 import 'package:flutter/material.dart';
-import 'package:movie_app/flutter_flow/flutter_flow_model.dart';
-import 'package:movie_app/flutter_flow/flutter_flow_theme.dart';
-import 'package:movie_app/flutter_flow/flutter_flow_util.dart';
 import 'package:provider/provider.dart';
-import '../service/provider.dart';
-import '../model/MarkPageModel.dart';
+import 'package:movie_app/service/provider.dart';
+import 'package:movie_app/pages/MovieDetails.dart'; 
 
-class MarkPageWidget extends StatefulWidget {
-  const MarkPageWidget({super.key});
-
-  static String routeName = 'MarkPage';
-  static String routePath = '/markPage';
-
-  @override
-  State<MarkPageWidget> createState() => _MarkPageWidgetState();
-}
-
-class _MarkPageWidgetState extends State<MarkPageWidget> {
-  late MarkPageModel _model;
-  final scaffoldKey = GlobalKey<ScaffoldState>();
-
-  @override
-  void initState() {
-    super.initState();
-    _model = createModel(context, () => MarkPageModel());
-  }
-
-  @override
-  void dispose() {
-    _model.dispose();
-    super.dispose();
-  }
+class FavoriteMoviesScreen extends StatelessWidget {
+  const FavoriteMoviesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final favoriteProvider = Provider.of<FavoriteMoviesProvider>(context);
+    final favoriteMovies = favoriteProvider.favoriteMovies;
 
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).unfocus();
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
-      child: Scaffold(
-        key: scaffoldKey,
-        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-        appBar: AppBar(
-          backgroundColor: Color(0xFFC30303),
-          automaticallyImplyLeading: false,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 30),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          title: Text(
-            'Mark',
-            style: FlutterFlowTheme.of(context).headlineMedium.override(
-                  fontFamily: 'Inter',
-                  color: Colors.white,
-                  fontSize: 22,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Favorites movies", 
+                  style: TextStyle(color: Colors.white),
                 ),
-          ),
-          centerTitle: true,
-          elevation: 2,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new, color: Colors.white,),
+          onPressed: () => Navigator.pop(context),
         ),
-        body: SafeArea(
-          top: true,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24),
-            child: favoriteProvider.favoriteMovies.isEmpty
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.bookmark_rounded, color: Color(0xFFC30303), size: 64),
-                      SizedBox(height: 10),
-                      Text(
-                        'Bookmark List is empty',
-                        style: FlutterFlowTheme.of(context).headlineMedium.override(
-                              fontFamily: 'Inter Tight',
-                              fontSize: 22,
-                            ),
-                      ),
-                      Text(
-                        'After bookmarking movies and series, they are displayed here',
-                        textAlign: TextAlign.center,
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              fontFamily: 'Inter',
-                              color: FlutterFlowTheme.of(context).secondaryText,
-                            ),
-                      ),
-                    ],
-                  )
-                : ListView.builder(
-                    itemCount: favoriteProvider.favoriteMovies.length,
-                    itemBuilder: (context, index) {
-                      final movie = favoriteProvider.favoriteMovies[index];
-
-                      return Container(
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        padding: const EdgeInsetsDirectional.fromSTEB(5, 5, 10, 5),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(color: Colors.grey.shade300, blurRadius: 5),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.network(
-                                'https://image.tmdb.org/t/p/w200${movie['poster_path']}',
-                                width: 80,
-                                height: 120,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    movie['title'],
-                                    style: const TextStyle(
-                                        fontSize: 16, fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Text("Language: ${movie['original_language']}"),
-                                  const SizedBox(height: 5),
-                                  Text("⭐ ${(movie['vote_average'] ?? 0).toStringAsFixed(1)}"),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.remove_circle, color: Colors.red),
-                              onPressed: () => favoriteProvider.toggleFavorite(movie),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-          ),
-        ),
+        backgroundColor: Color.fromARGB(255, 202, 30, 39),
+        elevation: 1,
       ),
+      backgroundColor: Colors.white,
+      body: favoriteMovies.isEmpty
+          ? Center(
+              child: Text(
+                "No favorite movies yet",
+                style: TextStyle(fontSize: 18, color: Colors.black54),
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              itemCount: favoriteMovies.length,
+              itemBuilder: (context, index) {
+                final movie = favoriteMovies[index];
+                final poster = movie['poster_path'];
+                final title = movie['title'] ?? 'No Title';
+                final rating = (movie['vote_average'] ?? 0).toDouble();
+                final language = movie['original_language']?.toUpperCase() ?? 'N/A';
+                final movieId = movie['id'];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetailsWidget(movieId: movieId),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: Color(0xFFF5F5F5),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.horizontal(left: Radius.circular(12)),
+                          child: Image.network(
+                            poster != null
+                                ? 'https://image.tmdb.org/t/p/w200$poster'
+                                : 'https://via.placeholder.com/100x150.png?text=No+Image',
+                            height: 150,
+                            width: 100,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  title,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontFamily: "Inter",
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                SizedBox(height: 6),
+                                Text(
+                                  'Language: $language',
+                                  style: TextStyle(fontSize: 13, color: Colors.black54),
+                                ),
+                                SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    Icon(Icons.star, size: 16, color: Color(0xFFFFD300)),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      rating.toStringAsFixed(1),
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                  ],
+                                ),
+                                Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: IconButton(
+                                    icon: Icon(Icons.bookmark_remove, color: Colors.red),
+                                    onPressed: () => favoriteProvider.toggleFavorite(movie),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }
-

@@ -2,8 +2,6 @@ import 'dart:async';
 import 'package:movie_app/component/MovieCard.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'package:movie_app/service/package.dart';
-import 'package:movie_app/pages/HomePage.dart' show HomePageWidget;
-import 'package:flutter/material.dart';
 
 class HomePageModel extends FlutterFlowModel<HomePageWidget> {
   PageController? pageViewController;

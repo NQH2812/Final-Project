@@ -25,7 +25,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         nextPage = const SearchPageWidget();
         break;
       case 2:
-        nextPage = const MarkPageWidget();
+        nextPage = FavoriteMoviesScreen();
         break;
       case 3:
         nextPage = const ProfilePageWidget();

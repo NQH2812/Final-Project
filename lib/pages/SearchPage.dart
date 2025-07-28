@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../service/api.dart';
 import '../component/BottomNav.dart';
 import '../pages/MovieDetails.dart';
+import '../service/gemini_service.dart';
+import '../component/ChatBot.dart';
 
 class SearchPageWidget extends StatefulWidget {
   const SearchPageWidget({super.key});
@@ -15,7 +17,7 @@ class SearchPageWidget extends StatefulWidget {
 }
 
 class _SearchPageWidgetState extends State<SearchPageWidget> {
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   List<dynamic> _searchResults = [];
   bool _isLoading = false;
   Timer? _debounce;
@@ -51,90 +53,111 @@ class _SearchPageWidgetState extends State<SearchPageWidget> {
     final secondaryTextColor = isDarkMode ? Colors.grey[400] : Colors.grey[700];
     final searchBarColor = isDarkMode ? Colors.grey[900] : Colors.grey[200];
 
+    // Khởi tạo GeminiService để truyền vào ChatBottomSheet
+    final GeminiService _geminiService = GeminiService();
+
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: backgroundColor,
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(15),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Search...',
-                  hintStyle: TextStyle(color: secondaryTextColor),
-                  prefixIcon: Icon(Icons.search, color: Colors.red),
-                  filled: true,
-                  fillColor: searchBarColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(50),
-                    borderSide: BorderSide.none,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(15),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search...',
+                    hintStyle: TextStyle(color: secondaryTextColor),
+                    prefixIcon: Icon(Icons.search, color: Colors.red),
+                    filled: true,
+                    fillColor: searchBarColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(50),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
+                  style: TextStyle(color: textColor),
+                  onChanged: _onSearchChanged,
                 ),
-                style: TextStyle(color: textColor),
-                onChanged: _onSearchChanged,
               ),
-            ),
-            Expanded(
-              child: _isLoading
-                  ? Center(child: CircularProgressIndicator(color: Colors.red))
-                  : _searchResults.isEmpty
-                      ? Center(child: Text("No results found", style: TextStyle(color: secondaryTextColor)))
-                      : ListView.builder(
-                          key: PageStorageKey<String>('searchResultsKey'),
-                          itemCount: _searchResults.length,
-                          itemBuilder: (context, index) {
-                            final movie = _searchResults[index];
-                            return Container(
-                              margin: const EdgeInsets.symmetric(vertical: 5),
-                                padding: const EdgeInsetsDirectional.fromSTEB(5, 5, 10, 5),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                    BoxShadow(color: Colors.grey.shade300, blurRadius: 5),
-                                  ],
+              Expanded(
+                child: _isLoading
+                    ? Center(child: CircularProgressIndicator(color: Colors.red))
+                    : _searchResults.isEmpty
+                        ? Center(child: Text("No results found", style: TextStyle(color: secondaryTextColor)))
+                        : ListView.builder(
+                            key: PageStorageKey<String>('searchResultsKey'),
+                            itemCount: _searchResults.length,
+                            itemBuilder: (context, index) {
+                              final movie = _searchResults[index];
+                              return Container(
+                                margin: const EdgeInsets.symmetric(vertical: 5),
+                                  padding: const EdgeInsetsDirectional.fromSTEB(5, 5, 10, 5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(color: Colors.grey.shade300, blurRadius: 5),
+                                    ],
+                                  ),
+                                child: ListTile(
+                                  leading: movie["poster_path"] != null
+                                      ? Image.network(
+                                          "https://image.tmdb.org/t/p/w200${movie["poster_path"]}",
+                                          width: 80,
+                                          height: 120,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Icon(Icons.movie, color: secondaryTextColor, size: 50),
+                                  title: Text(
+                                    movie["title"] ?? "Unknown Title",
+                                    maxLines: 1,
+                                    style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.star,
+                                        color: Color(0xFFFFD300),
+                                        size: 16,
+                                      ),
+                                      Text(
+                                        "${(movie["vote_average"] ?? 0).toDouble().toStringAsFixed(1)}",
+                                        style: TextStyle(color: textColor),
+                                      ),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context, 
+                                      MaterialPageRoute(
+                                        builder: (context) => DetailsWidget(movieId: movie["id"])));
+                                  },
                                 ),
-                              child: ListTile(
-                                leading: movie["poster_path"] != null
-                                    ? Image.network(
-                                        "https://image.tmdb.org/t/p/w200${movie["poster_path"]}",
-                                        width: 80,
-                                        height: 120,
-                                        fit: BoxFit.cover,
-                                      )
-                                    : Icon(Icons.movie, color: secondaryTextColor, size: 50),
-                                title: Text(
-                                  movie["title"] ?? "Unknown Title",
-                                  maxLines: 1,
-                                  style: TextStyle(color: textColor, fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.star,
-                                      color: Color(0xFFFFD300),
-                                      size: 16,
-                                    ),
-                                    Text(
-                                      "${(movie["vote_average"] ?? 0).toDouble().toStringAsFixed(1)}",
-                                      style: TextStyle(color: textColor),
-                                    ),
-                                  ],
-                                ),
-                                onTap: () {
-                                  Navigator.push(
-                                    context, 
-                                    MaterialPageRoute(
-                                      builder: (context) => DetailsWidget(movieId: movie["id"])));
-                                },
-                              ),
-                            );
-                          },
-                        ),
-            ),
-          ],
+                              );
+                            },
+                          ),
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              builder: (context) {
+                return ChatBottomSheet(geminiService: _geminiService);
+              },
+            );
+          },
+          backgroundColor: Colors.red,
+          child: Icon(Icons.chat, color: Colors.white,),
         ),
         bottomNavigationBar: BottomNavBar(currentIndex: 1),
       ),

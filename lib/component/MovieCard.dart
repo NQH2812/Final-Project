@@ -1,6 +1,5 @@
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:movie_app/pages/MovieDetails.dart';
 import 'package:movie_app/model/MovieCardModel.dart';
@@ -11,7 +10,7 @@ class MovieCardWidget extends StatefulWidget {
   final String title;
   final String language;
   final double rating;
-  final int movieId; // Thêm movieId
+  final int movieId; 
 
   const MovieCardWidget({
     super.key,
@@ -19,7 +18,7 @@ class MovieCardWidget extends StatefulWidget {
     required this.title,
     required this.language,
     required this.rating,
-    required this.movieId, // Nhận movieId
+    required this.movieId,
   }); 
 
 
@@ -55,7 +54,7 @@ class _MovieCardWidgetState extends State<MovieCardWidget> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => DetailsWidget(movieId: widget.movieId),
+              builder: (context) => DetailsWidget(movieId: widget.movieId), // Chuyển đến Details Widget
             ),
           );
         },
@@ -110,7 +109,7 @@ class _MovieCardWidgetState extends State<MovieCardWidget> {
                       style: FlutterFlowTheme.of(context).bodyMedium.override(
                             fontFamily: 'Inter',
                             letterSpacing: 0.0,
-                          ),
+                      ),
                     ),
                   ),
                   Spacer(),

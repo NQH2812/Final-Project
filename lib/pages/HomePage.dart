@@ -14,9 +14,6 @@ export 'package:movie_app/model/HomePageModel.dart';
 class HomePageWidget extends StatefulWidget {
   const HomePageWidget({super.key});
 
-  static String routeName = 'HomePage';
-  static String routePath = '/homePage';
-
   @override
   State<HomePageWidget> createState() => _HomePageWidgetState();
 }
@@ -24,14 +21,15 @@ class HomePageWidget extends StatefulWidget {
 class _HomePageWidgetState extends State<HomePageWidget> {
   late HomePageModel _model;
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  
  // Tạo danh sách phim
   List<dynamic> popularMovies = [];
   List<dynamic> topRatedMovies = [];
-  Map<int, String> genreMap = {};
   List<dynamic> trendingMovies = [];
 
-  bool isLoading = true;
+  Map<int, String> genreMap = {};
 
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -49,7 +47,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
     super.dispose();
   }
 
- // GET API
+ // GET API POPULAR
  Future<void> fetchMovies() async {
     final fetchedMovies = await MovieService.fetchMovies();
     if (mounted) {
@@ -108,7 +106,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: [
-                Container(
+                SizedBox(
                   width: double.infinity,
                   height: 400,
                   child: GestureDetector(
@@ -365,7 +363,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                             context, 
                             MaterialPageRoute(
                               builder: (context) => MoviesListPage(
-                                title: 'Top rated movies', 
+                                title: 'Popular movies', 
                                 movies: popularMovies,)
                             )
                           );
@@ -406,6 +404,73 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                             language: popularMovies[index]['original_language'], 
                             rating: popularMovies[index]['vote_average'].toDouble(),
                             movieId: popularMovies[index]['id'],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(24, 24, 24, 16),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Trending',
+                        style: FlutterFlowTheme.of(context).titleSmall.override(
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                              letterSpacing: 0.0,
+                            ),
+                      ),
+                      GestureDetector(
+                        onTap: () => {
+                          Navigator.push(
+                            context, 
+                            MaterialPageRoute(
+                              builder: (context) => MoviesListPage(
+                                title: 'Trending movies', 
+                                movies: topRatedMovies,)
+                            )
+                          )
+                        },
+                        child: Text(
+                          'See all >',
+                          style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                fontFamily: 'Inter',
+                                fontSize: 16,
+                                letterSpacing: 0.0,
+                              ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  height: 224,
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                  ),
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    physics: AlwaysScrollableScrollPhysics(), 
+                    itemCount: trendingMovies.length > 10 ? 10 : trendingMovies.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(10, 0, 2, 0),
+                        child: wrapWithModel(
+                          model: _model.movieCardModel2,
+                          updateCallback: () => safeSetState(() {}),
+                          child: MovieCardWidget(
+                            image: 'https://image.tmdb.org/t/p/w500${trendingMovies[index]['poster_path']}', 
+                            title: trendingMovies[index]['title'], 
+                            language: trendingMovies[index]['original_language'], 
+                            rating: trendingMovies[index]['vote_average'].toDouble(),
+                            movieId: trendingMovies[index]['id'],
                           ),
                         ),
                       );

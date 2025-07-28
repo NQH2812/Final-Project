@@ -1,10 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
 import '../pages/LoginPage.dart';
 import '../pages/HomePage.dart'; 
-import '../service/provider.dart';
 
 class AuthService {
   // Sign Up
@@ -35,7 +33,7 @@ class AuthService {
     }
   }
 
-  // Sign In
+ // Sign In
   Future<bool> signIn({
     required String email,
     required String password,
@@ -43,22 +41,11 @@ class AuthService {
   }) async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-
-      final provider = Provider.of<FavoriteMoviesProvider>(context, listen: false);
-
-      // 👉 Tạo document nếu chưa có
-      await provider.initializeFavorites();
-
-      // 👉 Tải danh sách phim yêu thích
-      await provider.loadFavoritesFromFirestore();
-
-      // 👉 Chuyển đến HomePage
       Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePageWidget()),
+        context, 
+        MaterialPageRoute(builder: (context) => HomePageWidget())
       );
-
-      return true;
+      return true; 
     } on FirebaseAuthException catch (e) {
       String message = 'Đăng nhập thất bại';
       if (e.code == 'user-not-found') {
@@ -66,7 +53,7 @@ class AuthService {
       } else if (e.code == 'wrong-password') {
         message = 'Mật khẩu sai';
       }
-
+      
       Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_LONG,
@@ -79,20 +66,95 @@ class AuthService {
     }
   }
 
-  // Sign Out
-  Future<void> signOut({
-    required BuildContext context,
-  }) async {
-    // 👉 Clear danh sách phim yêu thích trong provider
-    Provider.of<FavoriteMoviesProvider>(context, listen: false).clearFavorites();
+// Sign Out
+Future<void> signOut({
+  required BuildContext context,
+}) async {
+  // Đăng xuất Firebase
+  await FirebaseAuth.instance.signOut();
 
-    // 👉 Đăng xuất Firebase
-    await FirebaseAuth.instance.signOut();
+  // Chuyển về trang login
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (BuildContext context) => LoginPageWidget()),
+  );
+ }
 
-    // 👉 Chuyển về trang login
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (BuildContext context) => LoginPageWidget()),
+ // change password
+  Future<bool> changePassword({
+  required String currentPassword,
+  required String newPassword,
+  required BuildContext context,
+}) async {
+  try {
+    // Lấy user hiện tại
+    User? user = FirebaseAuth.instance.currentUser;
+    
+    if (user == null) {
+      Fluttertoast.showToast(
+        msg: "No user is currently logged in",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.SNACKBAR,
+        backgroundColor: Colors.redAccent,
+        textColor: Colors.white,
+        fontSize: 14.0,
+      );
+      return false;
+    }
+    
+    // Xác thực lại người dùng với mật khẩu hiện tại
+    AuthCredential credential = EmailAuthProvider.credential(
+      email: user.email!,
+      password: currentPassword,
     );
+    
+    // Đăng nhập lại để xác thực
+    await user.reauthenticateWithCredential(credential);
+    
+    // Tiến hành đổi mật khẩu
+    await user.updatePassword(newPassword);
+    
+    Fluttertoast.showToast(
+      msg: "Password changed successfully",
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.SNACKBAR,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+      fontSize: 14.0,
+    );
+    
+    return true;
+  } on FirebaseAuthException catch (e) {
+    String message = 'Password change failed';
+    
+    if (e.code == 'wrong-password') {
+      message = 'Current password is incorrect';
+    } else if (e.code == 'weak-password') {
+      message = 'New password is too weak';
+    } else if (e.code == 'requires-recent-login') {
+      message = 'Please log in again to perform this action';
+    }
+    
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.SNACKBAR,
+      backgroundColor: Colors.redAccent,
+      textColor: Colors.white,
+      fontSize: 14.0,
+    );
+    
+    return false;
+  } catch (e) {
+    Fluttertoast.showToast(
+      msg: "An error occurred: ${e.toString()}",
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.SNACKBAR,
+      backgroundColor: Colors.redAccent,
+      textColor: Colors.white,
+      fontSize: 14.0,
+    );
+    return false;
   }
+}
 }
