@@ -1,6 +1,6 @@
 # movie_app
 
-Tên đồ án: Ứng dụng xem phim trên di động
+Project: Movies app
 
 ## Cách chạy chương trình
 
